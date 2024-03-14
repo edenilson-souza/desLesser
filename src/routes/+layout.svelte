@@ -1,31 +1,41 @@
-<script>
-	import Header from '../components/basic/Header.svelte';
-	import './styles.css';
+<script lang="ts">
+	import 'tailwindcss/tailwind.css';
+	import { goto } from '$app/navigation';
+	import { onDestroy, onMount } from 'svelte';
+
+	export const navigation = {
+		goToCandidate() {
+			goto('/candidate');
+		}
+	};
+
+	let candidate: string | null = null;
+
+	const checkCandidateData = () => {
+		candidate = localStorage.getItem('candidateData') ?? null;
+	};
+
+	onMount(() => {
+		checkCandidateData();
+	});
+
+	const intervalId = setInterval(checkCandidateData, 200);
+
+	onDestroy(() => {
+		clearInterval(intervalId);
+	});
 </script>
 
-<div class="app">
-	<Header />
+<header class="flex justify-between items-center p-4 bg-blue-500 text-white">
+	<h1 class="text-2xl font-semibold">Lesser</h1>
+	{#if candidate !== null}
+		<button
+			class="bg-transparent border border-white text-white font-semibold px-4 py-2 rounded"
+			on:click={navigation.goToCandidate}>Candidate</button
+		>
+	{/if}
+</header>
 
-	<main>
-		<slot />
-	</main>
-</div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-		min-width: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-</style>
+<main>
+	<slot />
+</main>
